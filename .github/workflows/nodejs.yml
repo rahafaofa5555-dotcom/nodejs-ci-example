@@ -1,31 +1,28 @@
-# .github/workflows/nodejs.yml
 name: Node.js CI
+
 on:
- push:
- branches: [ main ]
- pull_request:
- branches: [ main ]
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
- build-and-test:
- runs-on: ubuntu-latest
- steps:
- - name: Checkout code
- uses: actions/checkout@v4
- - name: Set up Node.js
- uses: actions/setup-node@v4
- with:
- node-version: '20'
- - name: Install dependencies
- run: npm ci
- - name: Run tests
- run: npm test
- name: Workflow name # Display name in GitHub Actions tab
-on: [push, pull_request] # Events that trigger the workflow
-jobs: # One or more jobs that run
- job-name:
- runs-on: ubuntu-latest # Type of runner (Ubuntu, Windows, macOS)
- steps: # Sequence of tasks
- - name: Step name # Display name of the step
- uses: action/name # Pre-built action from GitHub Marketplace
- - name: Another step
- run: command # Run a command in the shell
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # Use Node versions that Jest v30 actually supports (v18.14+, v20, v22)
+        node-version: [20.x, 22.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - run: npm ci
+    - run: npm test
