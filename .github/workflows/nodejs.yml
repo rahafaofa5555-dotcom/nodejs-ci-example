@@ -16,7 +16,7 @@ jobs:
  with:
  node-version: '20'
  - name: Install dependencies
- run: npm install
+ run: npm ci
  - name: Run tests
  run: npm test
  name: Workflow name # Display name in GitHub Actions tab
@@ -29,4 +29,3 @@ jobs: # One or more jobs that run
  uses: action/name # Pre-built action from GitHub Marketplace
  - name: Another step
  run: command # Run a command in the shell
- 
