@@ -1,28 +1,35 @@
-name: Node.js CI
-
+# .github/workflows/nodejs.yml
+name: Node.js CI/CD
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+ push:
+ branches: [ main ]
+ pull_request:
+ branches: [ main ]
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        # Use Node versions that Jest v30 actually supports (v18.14+, v20, v22)
-        node-version: [20.x, 22.x]
-
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        
-    - run: npm ci
-    - run: npm test
+ build-and-test:
+ runs-on: ubuntu-latest
+ steps:
+ - name: Checkout code
+ uses: actions/checkout@v4
+ - name: Set up Node.js
+ uses: actions/setup-node@v4
+ with:
+ node-version: '20'
+ - name: Install dependencies
+ run: npm install
+ - name: Run tests
+ run: npm test
+ deploy-to-staging:
+ needs: build-and-test # This job depends on build-and-test passing
+ runs-on: ubuntu-latest
+ environment: Staging # Specify the Staging environment
+ steps:
+ - name: Checkout code
+ uses: actions/checkout@v4
+ - name: Simulate deployment to Staging
+ run: |
+ echo "Deploying application to Staging environment..."
+ echo "Application version: $(git rev-parse --short HEAD)"
+ echo "Deployment to Staging successful!"
+ # In a real scenario, this would involve commands to deploy to a cloud service
+ # e.g., `aws s3 sync build/ s3://staging-bucket` or `kubectl apply -f k8s-staging.yaml`
